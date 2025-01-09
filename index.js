@@ -91,7 +91,7 @@ async function generateDailyReports() {
                 for (let app of applications) {
                     try {
                         await generateReport(reportsFolder, app, token);
-                        logger.info(`Reports added for App: ${app.name}`)
+                        logger.info(`Report added for App: ${app.name}`)
                     } catch (err) {
                         logger.error(err, `App : ${app.name}`)
                     }
@@ -105,7 +105,7 @@ async function generateDailyReports() {
                 for (let app of applications) {
                     try {
                         await generateReport(reportsFolder, app, token)
-                        logger.info(`Reports added for App: ${app.name}`)
+                        logger.info(`Report added for App: ${app.name}`)
                     } catch (err) {
                         logger.error(err, `App : ${app.name}`)
                     }
@@ -120,7 +120,7 @@ async function generateDailyReports() {
             for (let app of applications) {
                 try {
                     await generateReport(reportsFolder, app, token);
-                    logger.info(`Reports added for App: ${app.name}`)
+                    logger.info(`Report added for App: ${app.name}`)
                 } catch (err) {
                     logger.error(err, `App : ${app.name}`)
                 }
