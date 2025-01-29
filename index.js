@@ -8,6 +8,8 @@ const constants = require("./utils/constants");
 const log4js = require('log4js');
 const logger = log4js.getLogger("app");
 const https = require('https');
+var AdmZip = require("adm-zip");
+const unzipper = require('unzipper')
 
 const app = express();
 const port = process.env.SECURE_PORT;
@@ -62,12 +64,40 @@ async function fetchApplicationsData(token) {
 }
 
 async function generateReport(dateFolder, appData, token) {
-    const fileName = `${appData.name.replace(/[^a-zA-Z0-9]/g, '_')}.xml`;
+    const fileName = `${appData.name.replace(/[^a-zA-Z0-9]/g, '_')}.zip`;
     const filePath = path.join(dateFolder, fileName);
 
     try {
-        const url = constants.ASE_GET_HTML_ISSUE_DETAILS.replace("{APPID}", appData.id);
-        await downloadFile(url, filePath, token)
+        const url = `${process.env.ASE_URL}${constants.ASE_REPORTS.replace("{APPID}", appData.id)}`;
+        let config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': 'asc_session_id=' + token,
+                'asc_xsrf_token': token,
+                'If-Match': '',
+            }
+        }
+        let data = {
+            "issueIdsAndQueries": ["severity=high,medium,low,information"],
+            "reportFileType": "XML"
+        }
+        let result = await axios.post(url, data, config);
+        let reportId = result.data.split(": ")[1];
+        await delay(25000)
+        let reportDownloadUrl = constants.ASE_REPORTS_DOWNLOAD.replace('${reportId}', reportId)
+        let tempFilePath = path.join(dateFolder, `${reportId}.zip`);
+
+        await downloadFile(reportDownloadUrl, tempFilePath, token)
+        await delay(2000)
+
+        await fs.createReadStream(tempFilePath)
+            .pipe(unzipper.Extract({ path: dateFolder }))
+            .on('close', () => {
+                fs.unlinkSync(tempFilePath); // Clean up temporary ZIP file
+            })
+            .on('error', (err) => {
+                console.error('Error extracting ZIP file:', err);
+            });
     } catch (err) {
         throw err;
     }
@@ -93,7 +123,7 @@ async function generateDailyReports() {
                         await generateReport(reportsFolder, app, token);
                         logger.info(`Report added for App: ${app.name}`)
                     } catch (err) {
-                        logger.error(err, `App : ${app.name}`)
+                        logger.error(err.message, `App : ${app.name}`)
                     }
                 }
             } else {
@@ -144,10 +174,7 @@ httpASEConfig = function (token, method, url) {
             'Cookie': 'asc_session_id=' + token,
             'asc_xsrf_token': token,
             'If-Match': ''
-        },
-        data: JSON.stringify([
-            "severity=high,medium,low,information"
-        ])
+        }
     };
 }
 
@@ -158,7 +185,7 @@ function delay(ms) {
 const downloadFile = async (url, downloadPath, token) => {
     try {
         const writer = require("fs").createWriteStream(downloadPath);
-        var httpOptions = httpASEConfig(token, "POST", url);
+        var httpOptions = httpASEConfig(token, "GET", url);
         httpOptions["responseType"] = 'stream';
 
         await axios(httpOptions).then(response => {
@@ -179,7 +206,7 @@ const downloadFile = async (url, downloadPath, token) => {
         });
 
     } catch (err) {
-        console.log(err)
+        logger.error(err.message)
     }
 }
 

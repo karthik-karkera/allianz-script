@@ -8,6 +8,8 @@ var constants = {
     ASE_UPDATE_ISSUE: "/api/issues/{ISSUEID}/",
     // ASE_GET_HTML_ISSUE_DETAILS: "/api/issues/details_v2?appId={APPID}&ids=[\"{ISSUEID}\"]",
     ASE_GET_HTML_ISSUE_DETAILS: "/api/issues/details_v2/xml?appId={APPID}&trafficCharacterLimit=2000",
+    ASE_REPORTS : "/api/issues/reports/securitydetails?appId={APPID}",
+    ASE_REPORTS_DOWNLOAD: '/api/issues/reports/${reportId}',
     ASE_JOB_SEARCH: "/api/jobs/search",
     LOG_LEVEL: "debug",
 	LOG_APPENDER1: "out",
