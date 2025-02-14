@@ -77,10 +77,124 @@ async function generateReport(dateFolder, appData, token) {
                 'If-Match': '',
             }
         }
+
         let data = {
-            "issueIdsAndQueries": ["severity=high,medium,low,information"],
-            "reportFileType": "XML"
+            "config": {
+                "executiveSummaryIncluded": true,
+                "advisoriesIncluded": true,
+                "visitedUrlsIncluded": true,
+                "componentGroupsIncluded": true,
+                "issueConfig": {
+                    "issueAttributeConfig": {
+                        "showEmptyValues": false,
+                        "attributeLookups": [
+                            "applicationname",
+                            "cvss",
+                            "cvssvector",
+                            "cvssversion",
+                            "comments",
+                            "description",
+                            "id",
+                            "location",
+                            "overdue",
+                            "scanname",
+                            "scanner",
+                            "severityvalue",
+                            "status",
+                            "datecreated",
+                            "fixeddate",
+                            "lastupdated",
+                            "attackcomplexity",
+                            "attackvector",
+                            "availabilityimpact",
+                            "confidentialityimpact",
+                            "exploitcodematurity",
+                            "integrityimpact",
+                            "privilegesrequired",
+                            "remediationlevel",
+                            "reportconfidence",
+                            "scope",
+                            "userinteraction",
+                            "api",
+                            "branchname",
+                            "callingline",
+                            "callingmethod",
+                            "class",
+                            "classification",
+                            "commitid",
+                            "componentname",
+                            "databasename",
+                            "databaseservicename",
+                            "databasetype",
+                            "databaseversion",
+                            "discoverymethod",
+                            "domain",
+                            "element",
+                            "externalid",
+                            "host",
+                            "line",
+                            "package",
+                            "path",
+                            "port",
+                            "projectid",
+                            "projectname",
+                            "projectversion",
+                            "projectversionid",
+                            "scantype",
+                            "scheme",
+                            "sourcefile",
+                            "third-partyid",
+                            "username"
+                        ]
+                    },
+                    "includeAdditionalInfo": false
+                },
+                "applicationAttributeConfig": {
+                    "showEmptyValues": false,
+                    "attributeLookups": [
+                        "businessimpact",
+                        "businessunit",
+                        "description",
+                        "riskrating",
+                        "testingstatus",
+                        "criticalissues",
+                        "fixedissues",
+                        "highissues",
+                        "informationissues",
+                        "lowissues",
+                        "mediumissues",
+                        "overdueissues",
+                        "totalissues"
+                    ]
+                },
+                "pdfPageBreakOnIssue": false,
+                "sortByURL": false
+            },
+            "layout": {
+                "reportOptionLayoutCoverPage": {
+                    "companyLogo": "",
+                    "additionalLogo": "",
+                    "includeDate": true,
+                    "includeReportType": true,
+                    "reportTitle": "Application Report",
+                    "description": "This report includes important security information about your application."
+                },
+                "reportOptionLayoutBody": {
+                    "header": "",
+                    "footer": ""
+                },
+                "includeTableOfContents": true
+            },
+            "reportFileType": "XML",
+            "issueIdsAndQueries": [
+                "status=open,status=inprogress,status=reopened,status=passed,status=fixed,status=new,classification=definitive,classification=suspect,severity=information",
+                "status=open,status=inprogress,status=reopened,status=passed,status=fixed,status=new,classification=definitive,classification=suspect,severity=low",
+                "status=open,status=inprogress,status=reopened,status=passed,status=fixed,status=new,classification=definitive,classification=suspect,severity=medium",
+                "status=open,status=inprogress,status=reopened,status=passed,status=fixed,status=new,classification=definitive,classification=suspect,severity=high",
+                "status=open,status=inprogress,status=reopened,status=passed,status=fixed,status=new,classification=definitive,classification=suspect,severity=critical"
+            ]
         }
+
         let result = await axios.post(url, data, config);
         let reportId = result.data.split(": ")[1];
         await delay(25000)
